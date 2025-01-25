@@ -4,9 +4,9 @@ const cors = require("cors"); // Importar CORS
 const connectDB = require("./db");
 const multas = require("./src/routes/multas");
 const user = require("./src/routes/user");
+const notificaciones = require("./src/routes/notificaciones");
 
 const app = express();
-
 // Conectar a MongoDB
 connectDB();
 
@@ -17,7 +17,7 @@ app.use(express.json());
 // Rutas
 app.use("/api", multas);
 app.use("/api",user);
-
+app.use("/api",notificaciones);
 
 // Servidor
 const PORT = process.env.PORT || 4000;

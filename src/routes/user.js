@@ -44,7 +44,7 @@ router.get('/obtener_usuarios', async (req, res) => {
 });
 
 
-// Login: Buscar usuario por teléfono
+// Logi: Buscar usuario por teléfono
 router.post('/login', async (req, res) => {
   try {
     const { phone } = req.body;
@@ -54,7 +54,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'El número de teléfono es obligatorio.' });
     }
 
-    // Buscar al usuario por su número de teléfono (aquí cambiamos "Usuario" por "User")
+    // Buscar al usuario por su número de teléfono
     const usuario = await User.findOne({ phone });
 
     // Si no se encuentra el usuario
@@ -62,9 +62,9 @@ router.post('/login', async (req, res) => {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
 
-    // Retornar solo los datos necesarios: nombre y perfil
-    const { name, profile } = usuario;
-    res.status(200).json({ name, profile });
+    // Asegúrate de que el campo sea 'department' (no 'departament')
+    const { name, profile, department } = usuario;  // Cambia 'departament' por 'department'
+    res.status(200).json({ name, profile, department });
 
   } catch (error) {
     console.error('Error al intentar loguearse:', error);
