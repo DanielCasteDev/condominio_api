@@ -6,12 +6,10 @@ const User = require('../models/usuarios'); // Ruta hacia el modelo de usuario
 router.post('/insertar_usuario', async (req, res) => {
     try {
         const { name, email, phone, profile, department, tower } = req.body;
-
         // Validar datos
         if (!name || !email || !phone || !profile || !department || !tower) {
             return res.status(400).json({ message: 'Todos los campos son obligatorios' });
         }
-
         // Crear nuevo usuario
         const nuevoUsuario = new User({ name, email, phone, profile, department, tower });
         await nuevoUsuario.save();
