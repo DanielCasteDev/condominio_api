@@ -31,11 +31,10 @@ router.post('/insertar_multas', async (req, res) => {
     }
 });
 
-// Ruta para obtener las multas junto con los usuarios
-router.get('/obtener_multas_con_usuario', async (req, res) => {
+router.get('/obtener_ultima_multa_todos', async (req, res) => {
     try {
-        // Obtener todos los usuarios y las multas asociadas
-        const usuariosConMultas = await User.aggregate([
+        // Obtener todos los usuarios y sus últimas multas
+        const usuariosConUltimaMulta = await User.aggregate([
             {
                 $lookup: {
                     from: 'multas', // Nombre de la colección de multas
@@ -43,31 +42,78 @@ router.get('/obtener_multas_con_usuario', async (req, res) => {
                     foreignField: 'departamento', // Relacionamos departamento en la colección Multa
                     as: 'multas' // El nombre del campo donde se guardarán las multas
                 }
+            },
+            {
+                $unwind: {
+                    path: '$multas', // Descomponemos el array de multas
+                    preserveNullAndEmptyArrays: true // Para incluir usuarios sin multas
+                }
+            },
+            {
+                $sort: { 'multas.fechamulta': -1 } // Ordenamos por fecha de multa descendente
+            },
+            {
+                $group: {
+                    _id: '$_id', // Agrupamos por usuario
+                    name: { $first: '$name' }, // Conservamos el nombre del usuario
+                    department: { $first: '$department' }, // Conservamos el departamento del usuario
+                    tower: { $first: '$tower' }, // Conservamos la torre del usuario
+                    ultimaMulta: { $first: '$multas' } // Conservamos la última multa
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    department: 1,
+                    tower: 1,
+                    ultimaMulta: {
+                        $ifNull: ['$ultimaMulta', null] // Si no hay multas, devolvemos null
+                    }
+                }
             }
         ]);
 
-        // Depuración: Verificar que los usuarios tienen o no multas
-        console.log(usuariosConMultas);
-
-        // Si no se encuentran usuarios, se retorna un mensaje
-        if (usuariosConMultas.length === 0) {
-            return res.status(404).json({ message: 'No se encontraron usuarios' });
-        }
-
-        // Formatear las fechas de las multas para devolverlas sin hora
-        usuariosConMultas.forEach(usuario => {
-            usuario.multas.forEach(multa => {
-                // Formateamos la fecha de la multa usando moment, eliminando la hora
-                multa.fechamulta = moment(multa.fechamulta).utc().format('YYYY-MM-DD'); // Solo mostramos la fecha (sin hora)
-            });
+        // Formatear las fechas de las multas
+        usuariosConUltimaMulta.forEach(usuario => {
+            if (usuario.ultimaMulta) {
+                usuario.ultimaMulta.fechamulta = moment(usuario.ultimaMulta.fechamulta).utc().format('YYYY-MM-DD');
+            }
         });
 
-        // Devolver los usuarios con las multas asociadas (vacío si no tienen)
-        res.json(usuariosConMultas);
+        // Devolver los usuarios con su última multa (o null si no tienen)
+        res.json(usuariosConUltimaMulta);
     } catch (error) {
-        console.error('Error al obtener los usuarios y multas:', error);
-        res.status(500).json({ message: 'Error al obtener los usuarios y multas' });
+        console.error('Error al obtener la última multa de todos los usuarios:', error);
+        res.status(500).json({ message: 'Error al obtener la última multa de todos los usuarios' });
     }
 });
+
+router.get('/obtener_historial_multas/:departamento', async (req, res) => {
+    try {
+        const { departamento } = req.params; // Obtener el departamento de los parámetros de la URL
+
+        // Validar que se proporcionó un departamento
+        if (!departamento) {
+            return res.status(400).json({ message: 'El departamento es obligatorio' });
+        }
+
+        // Buscar todas las multas del departamento y ordenarlas por fecha descendente
+        const historial = await Multa.find({ departamento }).sort({ fechamulta: -1 });
+
+        // Formatear las fechas de las multas
+        const historialFormateado = historial.map(multa => ({
+            ...multa._doc, // Conservar todos los campos de la multa
+            fechamulta: moment(multa.fechamulta).utc().format('YYYY-MM-DD') // Formatear la fecha
+        }));
+
+        // Devolver el historial formateado
+        res.json(historialFormateado);
+    } catch (error) {
+        console.error('Error al obtener el historial de multas:', error);
+        res.status(500).json({ message: 'Error al obtener el historial de multas' });
+    }
+});
+
 
 module.exports = router;
