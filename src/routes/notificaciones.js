@@ -30,7 +30,7 @@ router.post('/insertar_notis', async (req, res) => {
 });
 
 // Ruta para obtener las notificaciones
-router.get('/notificaciones', async (req, res) => {
+router.get('/obtener_notificaciones', async (req, res) => {
     try {
       // Obtener todas las notificaciones de la base de datos
       const notificaciones = await Notificacion.find().sort({ fechamulta: -1 }); // Ordenar por fecha de multa (más recientes primero)
@@ -47,7 +47,6 @@ router.get('/notificaciones', async (req, res) => {
       res.status(500).json({ message: 'Error al obtener las notificaciones.' });
     }
   });
-
 
 
 router.delete('/notificaciones', async (req, res) => {
