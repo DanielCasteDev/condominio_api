@@ -17,7 +17,7 @@ const connectDB = async () => {
         .catch((error) => {
           console.error("Error en el ping a MongoDB:", error.message);
         });
-    }, 10000); // 10 segundos
+    }, 10000); 
 
   } catch (error) {
     console.error("Error al conectar a MongoDB:", error.message);
