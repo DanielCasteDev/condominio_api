@@ -1,6 +1,7 @@
+// models/usuarios.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const { v4: uuidv4 } = require('uuid'); // Importar uuid para generar un ID único
+const { v4: uuidv4 } = require('uuid');
 
 const UsuarioSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -30,4 +31,8 @@ UsuarioSchema.methods.comparePassword = async function(candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
-module.exports = mongoose.model('Usuario', UsuarioSchema);
+// Crear el modelo Usuario
+const Usuario = mongoose.model('Usuario', UsuarioSchema);
+
+// Exportar el modelo
+module.exports = Usuario;
