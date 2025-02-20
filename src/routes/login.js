@@ -36,7 +36,7 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign(
             { id: usuario._id, name, profile, department, userId }, 
             process.env.JWT_SECRET,
-            { expiresIn: rememberSession ? '50d' : '15s' } 
+            { expiresIn: rememberSession ? '50d' : '1m' } 
         );
 
         // Guardar el token en la base de datos SOLO si se selecciona "recordar sesión"
