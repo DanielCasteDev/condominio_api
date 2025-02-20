@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid'); // Importar uuid para generar un ID único
 
 const UsuarioSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -8,9 +9,11 @@ const UsuarioSchema = new mongoose.Schema({
     profile: { type: String, required: true },
     department: { type: String, required: true },
     tower: { type: String, required: true },
-    password: { type: String, required: true }, // Nuevo campo para la contraseña
+    password: { type: String, required: true }, 
+    token: { type: String }, // Campo para almacenar el token
+    userId: { type: String, unique: true, default: uuidv4 }, // Agregamos el campo userId
 }, {
-    timestamps: true, // Agrega campos de fecha de creación y actualización automáticamente
+    timestamps: true, 
 });
 
 // Método para encriptar la contraseña antes de guardar el usuario
