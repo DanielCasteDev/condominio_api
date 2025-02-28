@@ -22,8 +22,7 @@ router.post('/insertar_usuario', async (req, res) => {
         res.status(500).json({ message: 'Error al registrar el usuario', error });
     }
 });
-
-// Obtener usuarios
+// Obtener usuario
 router.get('/obtener_usuarios', async (req, res) => {
   try {
       const usuarios = await User.find();
@@ -42,7 +41,5 @@ router.get('/obtener_usuarios', async (req, res) => {
       res.status(500).json({ message: 'Error al obtener los usuarios', error });
   }
 });
-
-
 
 module.exports = router;
